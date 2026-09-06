@@ -1,7 +1,8 @@
 """Application configuration settings."""
 from typing import List
+from typing_extensions import Annotated
 from pydantic import field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict, NoDecode
 
 
 class Settings(BaseSettings):
@@ -14,7 +15,10 @@ class Settings(BaseSettings):
     # PostgreSQL is intended application DB; SQLite is local development fallback
     DATABASE_URL: str = "sqlite+aiosqlite:///./medikiosk.db"
 
-    CORS_ORIGINS: List[str] = [
+    # NoDecode: skip pydantic-settings' default JSON decoding of env vars for
+    # list fields, so a plain comma-separated string (e.g. a Render env var)
+    # works in addition to a JSON array.
+    CORS_ORIGINS: Annotated[List[str], NoDecode] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:3001",
@@ -24,9 +28,7 @@ class Settings(BaseSettings):
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def _split_cors_origins(cls, v):
-        # Allow a plain comma-separated string (e.g. from a Render env var)
-        # in addition to a JSON array.
-        if isinstance(v, str) and not v.strip().startswith("["):
+        if isinstance(v, str):
             return [origin.strip() for origin in v.split(",") if origin.strip()]
         return v
 
