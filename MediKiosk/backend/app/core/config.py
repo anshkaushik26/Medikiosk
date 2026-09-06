@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     PROJECT_NAME: str = "MEDIKIOSK"
     API_V1_STR: str = "/api/v1"
-    SECRET_KEY: str = "medikiosk_dev_secret_key_2026_super_secure"
+    SECRET_KEY: str  # Required - must be set via environment variable
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
     ALGORITHM: str = "HS256"
 
@@ -20,7 +20,7 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3001",
     ]
 
-    DEMO_OTP: str = "123456"
+    DEMO_OTP: str = ""  # Set via environment for testing only
     DOCUMENT_OCR_PROVIDER: str = "mock"  # "mock", "paddleocr", "pdf"
     MAX_UPLOAD_SIZE_BYTES: int = 15 * 1024 * 1024  # 15 MB
 
