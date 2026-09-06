@@ -1,9 +1,9 @@
 #!/bin/bash
 set -o errexit
 
-pip install -r backend/requirements.txt
+pip install -r MediKiosk/backend/requirements.txt
 
 # If you have any database migrations, uncomment:
-# python backend/app/main.py  # or your migration command
+# python MediKiosk/backend/app/main.py  # or your migration command
 
 echo "Build completed successfully"

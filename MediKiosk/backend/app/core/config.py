@@ -1,5 +1,6 @@
 """Application configuration settings."""
 from typing import List
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -19,6 +20,15 @@ class Settings(BaseSettings):
         "http://localhost:3001",
         "http://127.0.0.1:3001",
     ]
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def _split_cors_origins(cls, v):
+        # Allow a plain comma-separated string (e.g. from a Render env var)
+        # in addition to a JSON array.
+        if isinstance(v, str) and not v.strip().startswith("["):
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
+        return v
 
     DEMO_OTP: str = ""  # Set via environment for testing only
     DOCUMENT_OCR_PROVIDER: str = "mock"  # "mock", "paddleocr", "pdf"

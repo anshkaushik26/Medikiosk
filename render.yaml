@@ -1,0 +1,44 @@
+databases:
+  - name: medikiosk-db
+    plan: free
+    databaseName: medikiosk
+    user: medikiosk
+
+services:
+  - type: web
+    name: medikiosk-backend
+    runtime: python
+    plan: free
+    rootDir: MediKiosk
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "10080"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: medikiosk-db
+          property: connectionString
+      - key: DEMO_OTP
+        value: "123456"
+      - key: DOCUMENT_OCR_PROVIDER
+        value: mock
+      - key: MAX_UPLOAD_SIZE_BYTES
+        value: "15728640"
+      - key: CORS_ORIGINS
+        value: https://medikiosk-frontend.onrender.com
+
+  - type: web
+    name: medikiosk-frontend
+    runtime: node
+    plan: free
+    rootDir: MediKiosk/frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://medikiosk-backend.onrender.com
